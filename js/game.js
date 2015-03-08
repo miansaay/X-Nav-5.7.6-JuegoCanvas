@@ -34,12 +34,23 @@ princessImage.onload = function () {
 };
 princessImage.src = "images/princess.png";
 
+
+// stone image
+var stoneReady = false;
+var stoneImage = new Image();
+stoneImage.onload = function () {
+	stoneReady = true;
+};
+stoneImage.src = "images/stone.png";
+
 // Game objects
 var hero = {
 	speed: 256 // movement in pixels per second
 };
 var princess = {};
 var princessesCaught = 0;
+
+var stone = {};
 
 // Handle keyboard controls
 var keysDown = {};
@@ -58,24 +69,36 @@ var reset = function () {
 	hero.y = canvas.height / 2;
 
 	// Throw the princess somewhere on the screen randomly
-	princess.x = 32 + (Math.random() * (canvas.width - 64));
-	princess.y = 32 + (Math.random() * (canvas.height - 64));
+	princess.x = 64 + (Math.random() * (canvas.width - 128));
+	princess.y = 64 + (Math.random() * (canvas.height - 128));
+
+ // Throw the princess somewhere on the screen randomly
+	stone.x = 64 + (Math.random() * (canvas.width - 128));
+	stone.y = 64 + (Math.random() * (canvas.height - 128));
+
 };
 
 // Update game objects
 var update = function (modifier) {
-	if (38 in keysDown) { // Player holding up
-		hero.y -= hero.speed * modifier;
-	}
-	if (40 in keysDown) { // Player holding down
-		hero.y += hero.speed * modifier;
-	}
-	if (37 in keysDown) { // Player holding left
-		hero.x -= hero.speed * modifier;
-	}
-	if (39 in keysDown) { // Player holding right
-		hero.x += hero.speed * modifier;
-	}
+
+if ((canvas.width - hero.x + 32) <= (canvas.width) && (canvas.height - hero.y + 32) <= (canvas.height) &&
+    (hero.x ) <= (canvas.width - 64) && (hero.y) <= (canvas.height - 64)){ 
+
+   console.log(hero.x + " " + canvas.width);
+   console.log(hero.y + " " + canvas.height);
+	  if (38 in keysDown) { // Player holding up
+		   hero.y -= hero.speed * modifier;
+	  }
+	  if (40 in keysDown) { // Player holding down
+		   hero.y += hero.speed * modifier;
+	  }
+	  if (37 in keysDown) { // Player holding left
+		   hero.x -= hero.speed * modifier;
+	  }
+	  if (39 in keysDown) { // Player holding right
+		   hero.x += hero.speed * modifier;
+	  }
+
 
 	// Are they touching?
 	if (
@@ -87,6 +110,7 @@ var update = function (modifier) {
 		++princessesCaught;
 		reset();
 	}
+}
 };
 
 // Draw everything
@@ -102,6 +126,10 @@ var render = function () {
 	if (princessReady) {
 		ctx.drawImage(princessImage, princess.x, princess.y);
 	}
+
+ //if (stoneReady) {
+		//ctx.drawImage(stoneImage, stone.x, stone.y);
+	//}
 
 	// Score
 	ctx.fillStyle = "rgb(250, 250, 250)";
@@ -125,6 +153,6 @@ var main = function () {
 // Let's play this game!
 reset();
 var then = Date.now();
-//The setInterval() method will wait a specified number of milliseconds, and then execute a specified function, and it will continue to execute the function, once at every given time-interval.
+//The setInterval() method will wait a specified number of milliseconds, and then execute a specified function, and it will continue to  execute the function, once at every given time-interval.
 //Syntax: setInterval("javascript function",milliseconds);
 setInterval(main, 1); // Execute as fast as possible
