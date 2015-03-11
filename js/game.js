@@ -85,23 +85,26 @@ var reset = function () {
 // Update game objects
 var update = function (modifier) {
 
-if ((canvas.width - hero.x + 32) <= (canvas.width) && (canvas.height - hero.y + 32) <= (canvas.height) &&
-    (hero.x ) <= (canvas.width - 64) && (hero.y) <= (canvas.height - 64)){ 
-
-    console.log(hero.x + " " + canvas.width);
-    console.log(hero.y + " " + canvas.height);
-	  if (38 in keysDown) { // Player holding up
-		   hero.y -= hero.speed * modifier;
-	  }
-	  if (40 in keysDown) { // Player holding down
-		   hero.y += hero.speed * modifier;
-	  }
-	  if (37 in keysDown) { // Player holding left
-		   hero.x -= hero.speed * modifier;
-	  }
-	  if (39 in keysDown) { // Player holding right
-		   hero.x += hero.speed * modifier;
-	  }
+  if (38 in keysDown) { // Player holding up
+    if (hero.y > 32){
+		    hero.y -= hero.speed * modifier;
+    }
+	 }
+	 if (40 in keysDown) { // Player holding down
+    if (hero.y < 418) {
+		    hero.y += hero.speed * modifier;
+    }
+	 }
+	 if (37 in keysDown) { // Player holding left
+    if (hero.x > 32){
+		    hero.x -= hero.speed * modifier;
+    }
+	 }
+	 if (39 in keysDown) { // Player holding right
+    if (hero.x < 450){
+		    hero.x += hero.speed * modifier;
+    }
+	 }
 
 
 	// Are they touching?
@@ -115,7 +118,6 @@ if ((canvas.width - hero.x + 32) <= (canvas.width) && (canvas.height - hero.y + 
     localStorage.setItem("score", princessesCaught);
 		reset();
 	}
-}
 };
 
 // Draw everything
