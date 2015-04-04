@@ -43,18 +43,38 @@ stoneImage.onload = function () {
 };
 stoneImage.src = "images/stone.png";
 
+// monster image
+var monsterReady = false;
+var monsterImage = new Image();
+monsterImage.onload = function () {
+	monsterReady = true;
+};
+monsterImage.src = "images/monster.png";
+
 // Game objects
 var hero = {
 	speed: 256 // movement in pixels per second
 };
 var princess = {};
 //var princessesCaught = 0;
-princessesCaught = localStorage.getItem("score");
+var princessesCaught = localStorage.getItem("score");
 if (princessesCaught == null) {
    princessesCaught = 0;
 }
 
+//var level = 1;
+var level = localStorage.getItem("nivel");
+if (level == null) {
+   level = 1;
+}
+
 var stone = {};
+var stonex = new Array();
+var stoney = new Array();
+
+var monster = {
+	speed: 180
+};
 
 // Handle keyboard controls
 var keysDown = {};
@@ -77,9 +97,48 @@ var reset = function () {
 	princess.y = 64 + (Math.random() * (canvas.height - 128));
 
  // Throw the princess somewhere on the screen randomly
-	stone.x = 64 + (Math.random() * (canvas.width - 128));
-	stone.y = 64 + (Math.random() * (canvas.height - 128));
+ monster.x = 64 + (Math.random() * (canvas.width - 128));
+	monster.y = 64 + (Math.random() * (canvas.height - 128));
 
+ // Throw the princess somewhere on the screen randomly
+ for (var i=0; i<=6; i++){
+	  stone.x = 64 + (Math.random() * (canvas.width - 128));
+	  stone.y = 64 + (Math.random() * (canvas.height - 128));
+
+   if (
+			  hero.x <= (stone.x + 24)
+			  && stone.x <= (hero.x + 24)
+			  && hero.y <= (stone.y + 28)
+			  && stone.y <= (hero.y + 16)
+		 ) {
+			  stone.x = stone.x + 48;
+			  stone.y = stone.y + 48;
+		 } 
+
+   if(			
+			princess.x <= (stone.x + 24)
+			&& stone.x <= (princess.x + 24)
+			&& princess.y <= (stone.y + 28)
+			&& stone.y <= (princess.y + 16)
+			){
+				stone.x = stone.x + 48;
+				stone.y = stone.y + 48;
+		 }
+   if (stone.y <= 10){
+			 stone.y = 11;
+		 }
+		 if (stone.y >= 415){
+			 stone.y = 414;
+		 }
+		 if (stone.x <=30){
+			 stone.x = 29;
+		 }
+		 if (stone.x >= 450){
+			 stone.x = 449;
+		 }
+   stonex[i] = stone.x;
+		 stoney[i] = stone.y;
+ }
 };
 
 // Update game objects
@@ -106,6 +165,62 @@ var update = function (modifier) {
     }
 	 }
 
+  // MONSTER
+	if (38 in keysDown) { // Player holding up
+
+		if (hero.y > monster.y){
+			monster.y += monster.speed *modifier;
+		}else if(hero.y < monster.y ){
+			monster.y -= monster.speed *modifier;
+		}
+	}
+	if (40 in keysDown) { // Player holding down
+		if (hero.y > monster.y){
+			monster.y += monster.speed *modifier;
+		}else if(hero.y < monster.y ){
+			monster.y -= monster.speed *modifier;
+		}
+	}
+	if (37 in keysDown) { // Player holding left
+		if (hero.x > monster.x){
+			monster.x += monster.speed *modifier;
+		}else if(hero.x < monster.x ){
+			monster.x -= monster.speed *modifier;
+		}
+	}
+
+ //Stones
+ for (var i=0; i<=6; i++){
+		 if (
+			 hero.x <= (stonex[i] + 24)
+			 && stonex[i] <= (hero.x + 24)
+			 && hero.y <= (stoney[i] + 28)
+			 && stoney[i] <= (hero.y + 16)
+		 ) {
+			 if (38 in keysDown) {
+				 hero.y = hero.y +10;
+			 }
+			 if (40 in keysDown) {
+				 hero.y = hero.y -10;
+			 }
+			 if (37 in keysDown) {
+				 hero.x = hero.x +10;
+			 }
+			 if (39 in keysDown) {
+				 hero.x = hero.x -10;
+			 }
+		 }
+	 }
+  
+  if (
+		hero.x <= (monster.x + 16)
+		&& monster.x <= (hero.x + 16)
+		&& hero.y <= (monster.y + 16)
+		&& monster.y <= (hero.y + 32)
+	) {
+		princessesCaught=0;
+		reset();
+	}
 
 	// Are they touching?
 	if (
@@ -115,10 +230,15 @@ var update = function (modifier) {
 		&& princess.y <= (hero.y + 32)
 	) {
 		++princessesCaught;
-    localStorage.setItem("score", princessesCaught);
+  localStorage.setItem("score", princessesCaught);
+  if (princessesCaught == 10) {
+     ++level;
+     localStorage.setItem("nivel", level);
+  }
 		reset();
 	}
 };
+
 
 // Draw everything
 var render = function () {
@@ -138,12 +258,23 @@ var render = function () {
 		//ctx.drawImage(stoneImage, stone.x, stone.y);
 	//}
 
+ if (stoneReady) {
+		for (var i=0; i<=6; i++){
+			ctx.drawImage(stoneImage, stonex[i], stoney[i]);
+		}
+	}
+
+ if (monsterReady) {
+		ctx.drawImage(monsterImage, monster.x, monster.y);
+	}
+
 	// Score
 	ctx.fillStyle = "rgb(250, 250, 250)";
 	ctx.font = "24px Helvetica";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
 	ctx.fillText("Princesses caught: " + princessesCaught, 32, 32);
+ ctx.fillText("Level: " + level, 360, 32);
   
 };
 
